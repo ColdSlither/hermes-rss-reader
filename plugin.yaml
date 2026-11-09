@@ -1,0 +1,11 @@
+name: rss-reader
+version: 0.1.0
+description: Personal RSS/Atom reader — subscribe to feeds, fetch items, and watch for new entries. Ships a desktop reader pane and a weekly watch blueprint. Seeded with Phrack community feeds.
+author: ColdSlither
+requires_hermes: ">=0.23"
+provides_tools:
+  - rss_list_feeds
+  - rss_add_feed
+  - rss_remove_feed
+  - rss_fetch
+  - rss_check
