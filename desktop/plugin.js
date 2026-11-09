@@ -5,7 +5,7 @@
  * Only @hermes/plugin-sdk, react and react/jsx-runtime are imported.
  */
 
-import { host } from '@hermes/plugin-sdk'
+import { host, PALETTE_AREA } from '@hermes/plugin-sdk'
 import { useEffect, useState } from 'react'
 import { jsx, jsxs } from 'react/jsx-runtime'
 
@@ -118,6 +118,7 @@ function ReaderPane({ api, open }) {
 export default {
   id: ID, // must match the folder/plugin name
   name: 'RSS Reader',
+  defaultEnabled: true, // pane loads on install; Settings → Plugins stays a live off-switch
   register(ctx) {
     const api = {
       get: (path) => ctx.rest(path),
@@ -144,16 +145,19 @@ export default {
     })
 
     ctx.register({
-      id: 'refresh',
-      area: 'PALETTE_AREA',
-      data: { title: 'RSS Reader: check all feeds for new items' },
-      render: () => null,
-      run: async () => {
-        try {
-          const r = await ctx.rest('/check', { method: 'POST', body: {} })
-          const fresh = (r.results || []).reduce((n, x) => n + (x.new || []).length, 0)
-          host.notify({ kind: fresh ? 'info' : 'success', message: fresh ? fresh + ' new item(s) across feeds' : 'No new items' })
-        } catch (e) { host.notify({ kind: 'error', message: 'Feed check failed: ' + (e.message || e) }) }
+      id: 'check',
+      area: PALETTE_AREA,
+      data: {
+        id: 'rssReader.check',
+        label: 'RSS Reader: check all feeds for new items',
+        keywords: ['rss', 'feed', 'feeds', 'phrack', 'news'],
+        run: async () => {
+          try {
+            const r = await ctx.rest('/check', { method: 'POST', body: {} })
+            const fresh = (r.results || []).reduce((n, x) => n + (x.new || []).length, 0)
+            host.notify({ kind: fresh ? 'info' : 'success', message: fresh ? fresh + ' new item(s) across feeds' : 'No new items' })
+          } catch (e) { host.notify({ kind: 'error', message: 'Feed check failed: ' + (e.message || e) }) }
+        },
       },
     })
   },
